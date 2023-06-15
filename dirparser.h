@@ -9,10 +9,9 @@ struct _DirParser
 {
     CStringList *pathlist;
 
-    CStringList *incl;
-    CStringList *excl;
-
     bool all;
+    CStringList *excl;
+    CStringList *incl;
 };
 
 DirParser* parser_new();
@@ -25,7 +24,6 @@ GC_UNUSED static inline void _freeDirParser(DirParser **parser)
 }
 
 void parser_sort(DirParser *parser);
-
 bool parser_run(DirParser *parser, const char *path);
 
 #endif // DIRPARSER_H

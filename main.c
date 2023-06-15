@@ -36,6 +36,9 @@ int main(int argc, char **argv)
             if (++n >= argc)
                 return EXIT_FAILURE;
 
+            if (!parser->excl)
+                parser->excl = cstrlist_new_size(12);
+
             cstrlist_split(parser->excl, argv[n], ",", false, true);
         }
         else if (strcmp(part, "-a") == 0)
@@ -44,6 +47,9 @@ int main(int argc, char **argv)
         }
         else
         {
+            if (!parser->incl)
+                parser->incl = cstrlist_new_size(12);
+
             cstrlist_split(parser->incl, part, ",", false, true);
         }
 
