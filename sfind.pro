@@ -8,11 +8,13 @@ PKGCONFIG =
 PKGCONFIG += tinyc
 
 HEADERS = \
-    dirparser.h
+    dirparser.h \
+    pathcmp.h
 
 SOURCES = \
     dirparser.c \
     main.c \
+    pathcmp.c
 
 DISTFILES = \
     install.sh \

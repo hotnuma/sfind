@@ -20,6 +20,7 @@ app_deps = [
 app_sources = [
     'dirparser.c',
     'main.c',
+    'pathcmp.c',
 ]
 
 executable(

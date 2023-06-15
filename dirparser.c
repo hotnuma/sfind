@@ -1,7 +1,7 @@
 #include "dirparser.h"
 
+#include "pathcmp.h"
 #include <cdirparser.h>
-#include <libpath.h>
 #include <fnmatch.h>
 #include <stdio.h>
 
