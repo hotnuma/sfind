@@ -43,7 +43,7 @@ int main(int argc, char **argv)
         }
         else if (strcmp(part, "-a") == 0)
         {
-            parser->all = true;
+            parser_set(parser, DP_ALL);
         }
         else
         {

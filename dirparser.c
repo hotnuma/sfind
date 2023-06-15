@@ -7,6 +7,8 @@
 
 #include <print.h>
 
+// FLAG_UNSET(parser, flag) ((parser)->flags &= ~(flag));
+
 static bool _matchfunc(const char *dir, const char *item,
                        int type, DirParser *parser);
 static int _compare(void *entry1, void *entry2);
@@ -17,7 +19,7 @@ DirParser* parser_new()
     DirParser *parser = (DirParser*) malloc(sizeof(DirParser));
     parser->pathlist = cstrlist_new_size(128);
 
-    parser->all = false;
+    parser->flags = 0;
     parser->excl = NULL;
     parser->incl = NULL;
 
@@ -32,6 +34,16 @@ void parser_free(DirParser *parser)
     cstrlist_free(parser->incl);
 
     free(parser);
+}
+
+void parser_set(DirParser *parser, int flag)
+{
+    parser->flags |= flag;
+}
+
+bool parser_is_set(DirParser *parser, int flag)
+{
+    return ((parser->flags & flag) != 0);
 }
 
 void parser_sort(DirParser *parser)
@@ -84,7 +96,7 @@ static bool _matchfunc(const char *dir, const char *item,
     (void) dir;
     (void) type;
 
-    if (parser->all == false && item[0] == '.')
+    if (!parser_is_set(parser, DP_ALL) && item[0] == '.')
         return false;
 
     if (parser->excl == NULL)
