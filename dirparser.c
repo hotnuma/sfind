@@ -7,21 +7,15 @@
 
 #include <print.h>
 
-// FLAG_UNSET(parser, flag) ((parser)->flags &= ~(flag));
-
 static bool _matchfunc(const char *dir, const char *item,
                        int type, DirParser *parser);
 static int _compare(void *entry1, void *entry2);
 static bool _parser_match(DirParser *parser, const char *filepath);
 
-DirParser* parser_new()
+DirParser *parser_new()
 {
-    DirParser *parser = (DirParser*) malloc(sizeof(DirParser));
+    DirParser *parser = (DirParser *)calloc(1, sizeof(DirParser));
     parser->pathlist = cstrlist_new_size(128);
-
-    parser->flags = 0;
-    parser->excl = NULL;
-    parser->incl = NULL;
 
     return parser;
 }
@@ -48,13 +42,13 @@ bool parser_is_set(DirParser *parser, int flag)
 
 void parser_sort(DirParser *parser)
 {
-    cstrlist_sort_func(parser->pathlist, (CCompareFunc) _compare);
+    cstrlist_sort_func(parser->pathlist, (CCompareFunc)_compare);
 }
 
 static int _compare(void *entry1, void *entry2)
 {
-    CString *e1 = *((CString**) entry1);
-    CString *e2 = *((CString**) entry2);
+    CString *e1 = *((CString **)entry1);
+    CString *e2 = *((CString **)entry2);
 
     return path_cmp(c_str(e1), c_str(e2));
 }
@@ -62,7 +56,7 @@ static int _compare(void *entry1, void *entry2)
 bool parser_run(DirParser *parser, const char *dirpath)
 {
     CDirParserAuto *dir = cdirparser_new();
-    cdirparser_setmatch(dir, (CDirParserMatch) _matchfunc, parser);
+    cdirparser_setmatch(dir, (CDirParserMatch)_matchfunc, parser);
 
     if (!cdirparser_open(dir, dirpath, CDP_FILES | CDP_SUBDIRS))
         return false;
@@ -93,8 +87,8 @@ bool parser_run(DirParser *parser, const char *dirpath)
 static bool _matchfunc(const char *dir, const char *item,
                        int type, DirParser *parser)
 {
-    (void) dir;
-    (void) type;
+    (void)dir;
+    (void)type;
 
     if (!parser_is_set(parser, DP_ALL) && item[0] == '.')
         return false;

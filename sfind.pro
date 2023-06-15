@@ -12,6 +12,7 @@ HEADERS = \
     pathcmp.h
 
 SOURCES = \
+    0Temp.c \
     dirparser.c \
     main.c \
     pathcmp.c

@@ -19,6 +19,8 @@ struct _DirParser
     int flags;
     CStringList *excl;
     CStringList *incl;
+    uint64_t t1;
+    uint64_t t2;
 };
 
 DirParser* parser_new();
