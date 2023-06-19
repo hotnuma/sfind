@@ -9,8 +9,8 @@ typedef struct _DirParser DirParser;
 
 #define DP_NONE      0
 #define DP_ALL      (1 << 0)
+#define DP_SINGLE   (1 << 1)
 
-//#define DP_OTHER  (1 << 1)
 //#define DP_OTHER  (1 << 2)
 //#define DP_OTHER  (1 << 3)
 

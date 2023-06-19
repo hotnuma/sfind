@@ -8,6 +8,8 @@ static int _app_exit(bool usage, int ret)
     {
         print("*** usage :");
         print("sfind /home/me/mydir");
+        print("sfind . -a");
+        print("sfind . -s");
         print("sfind . \"*.c\"");
         print("sfind . -x \"not_this\" \"*.c\"");
         print("sfind . -x \"exclude,dirs\" \"*.h,*.c\"");
@@ -42,6 +44,11 @@ int main(int argc, char **argv)
         if (strcmp(part, "-a") == 0)
         {
             parser_set(parser, DP_ALL);
+        }
+
+        else if (strcmp(part, "-s") == 0)
+        {
+            parser_set(parser, DP_SINGLE);
         }
 
         else if (strcmp(part, "-x") == 0)

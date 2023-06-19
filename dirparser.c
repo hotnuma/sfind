@@ -134,7 +134,12 @@ bool parser_run(DirParser *parser, const char *dirpath)
     CDirParserAuto *dir = cdirparser_new();
     cdirparser_setmatch(dir, (CDirParserMatch)_matchfunc, parser);
 
-    if (!cdirparser_open(dir, dirpath, CDP_FILES | CDP_SUBDIRS))
+    int flags = CDP_FILES;
+
+    if (!parser_is_set(parser, DP_SINGLE))
+        flags |= CDP_SUBDIRS;
+
+    if (!cdirparser_open(dir, dirpath, flags))
         return false;
 
     CStringAuto *filepath = cstr_new_size(256);
