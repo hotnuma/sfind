@@ -15,8 +15,8 @@ static int _app_exit(bool usage, int ret)
 
 int main(int argc, char **argv)
 {
-    CStringAuto *dirpath = cstr_new_size(256);
     DirParserAuto *parser = parser_new();
+    CStringAuto *dirpath = cstr_new_size(256);
 
     if (argc < 2)
     {
@@ -26,6 +26,7 @@ int main(int argc, char **argv)
     cstr_copy(dirpath, argv[1]);
 
     int n = 2;
+    bool argmode = false;
 
     while (n < argc)
     {
@@ -45,16 +46,29 @@ int main(int argc, char **argv)
         {
             parser_set(parser, DP_ALL);
         }
+        else if (strcmp(part, "-exec") == 0)
+        {
+            argmode = true;
+        }
         else
         {
-            if (!parser->incl)
-                parser->incl = cstrlist_new_size(12);
+            if (argmode)
+            {
+                parser_args_append(parser, part);
+            }
+            else
+            {
+                if (!parser->incl)
+                    parser->incl = cstrlist_new_size(12);
 
-            cstrlist_split(parser->incl, part, ",", false, true);
+                cstrlist_split(parser->incl, part, ",", false, true);
+            }
         }
 
         ++n;
     }
+
+    parser_args_terminate(parser);
 
     parser_run(parser, c_str(dirpath));
 

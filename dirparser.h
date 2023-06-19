@@ -2,6 +2,7 @@
 #define DIRPARSER_H
 
 #include <cstringlist.h>
+#include <clist.h>
 
 typedef struct _DirParser DirParser;
 
@@ -14,6 +15,8 @@ typedef struct _DirParser DirParser;
 
 struct _DirParser
 {
+    CString *directory;
+
     CStringList *pathlist;
 
     int flags;
@@ -21,6 +24,10 @@ struct _DirParser
     CStringList *incl;
     uint64_t t1;
     uint64_t t2;
+
+    CList *args;
+    CList *argsreal;
+    int childstatus;
 };
 
 DirParser* parser_new();
@@ -34,7 +41,9 @@ GC_UNUSED static inline void _freeDirParser(DirParser **parser)
 
 void parser_set(DirParser *parser, int flag);
 bool parser_is_set(DirParser *parser, int flag);
-void parser_sort(DirParser *parser);
+void parser_args_append(DirParser *parser, const char *arg);
+void parser_args_terminate(DirParser *parser);
+
 bool parser_run(DirParser *parser, const char *path);
 
 #endif // DIRPARSER_H
