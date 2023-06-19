@@ -7,10 +7,13 @@ static int _app_exit(bool usage, int ret)
     if (usage)
     {
         print("*** usage :");
-        print("\tsfind dirpath");
+        print("\tsfind /home/me/mydir");
         print("\tsfind . \"*.c\"");
+        print("\tsfind . -x \"not_this\" \"*.c\"");
         print("\tsfind . -x \"exclude,dirs\" \"*.h,*.c\"");
         print("\tsfind . \"*.h,*.c\" -exec ls -la {}");
+        print("\tsfind . -from \"2023/06/12\" -to \"2023/06/12\"");
+        print("\tsfind . -eq \"2023/06/12\"");
     }
 
     return ret;
