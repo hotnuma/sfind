@@ -10,12 +10,9 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <errno.h>
-#include <sys/stat.h>
-
 #include <time.h>
-//#include <inttypes.h>
 
-#include <print.h>
+//#include <print.h>
 
 #if defined O_LARGEFILE
 #define OPENFLAGS (O_RDONLY | O_LARGEFILE)
@@ -64,16 +61,50 @@ bool parser_is_set(DirParser *parser, int flag)
     return ((parser->flags & flag) != 0);
 }
 
-bool parser_get_date(const char *datestr, uint64_t *result)
+bool parser_set_timenow(DirParser *parser, const char *timestr)
 {
-    struct tm tm = {0};
+    int scale = 0;
 
-    if (strptime(datestr, "%Y/%m/%d", &tm) == NULL)
+    char *end;
+    unsigned long val = strtoul(timestr, &end, 10);
+
+    if (!end)
         return false;
 
-    tm.tm_isdst = -1;
+    if (strcmp(end, " se") == 0)
+    {
+        printf("sec = %lu\n", val);
+        scale = 1;
+    }
+    else if (strcmp(end, " mi") == 0)
+    {
+        printf("min = %lu\n", val);
+        scale = 60;
+    }
+    else if (strcmp(end, " ho") == 0)
+    {
+        printf("hour = %lu\n", val);
+        scale = 3600;
+    }
+    else if (strcmp(end, " da") == 0)
+    {
+        printf("day = %lu\n", val);
+        scale = 86400;
+    }
+    else
+    {
+        return false;
+    }
 
-    *result = mktime(&tm);
+    if (val < 1)
+        return false;
+
+    if (!parser->info)
+        parser->info = cfileinfo_new();
+
+    parser->t2 = time(NULL);
+    parser->t1 = parser->t2 - (val * scale) - 1;
+    parser->t2 += 3600;
 
     return true;
 }
@@ -195,14 +226,17 @@ static bool _parser_match(DirParser *parser, const char *filepath)
 {
     if (parser->info && cfileinfo_read(parser->info, filepath))
     {
-        uint64_t mtime = cfileinfo_mtime(parser->info);
+        uint64_t ftime;
 
-        //print("%u", mtime);
+        if (parser_is_set(parser, DP_ATIME))
+            ftime = cfileinfo_atime(parser->info);
+        else
+            ftime = cfileinfo_mtime(parser->info);
 
-        if (parser->t1 > 0 && mtime < parser->t1)
+        if (parser->t1 > 0 && ftime < parser->t1)
             return false;
 
-        if (parser->t2 > 0 && mtime > parser->t2)
+        if (parser->t2 > 0 && ftime > parser->t2)
             return false;
     }
 

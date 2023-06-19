@@ -1,5 +1,6 @@
 #include "dirparser.h"
 
+#include <time.h>
 #include <print.h>
 
 static int _app_exit(bool usage, int ret)
@@ -20,6 +21,26 @@ static int _app_exit(bool usage, int ret)
     }
 
     return ret;
+}
+
+bool _get_size(uint64_t *result, const char *sizestr)
+{
+
+    return true;
+}
+
+bool _get_date(uint64_t *result, const char *datestr)
+{
+    struct tm tm = {0};
+
+    if (strptime(datestr, "%Y/%m/%d", &tm) == NULL)
+        return false;
+
+    tm.tm_isdst = -1;
+
+    *result = mktime(&tm);
+
+    return true;
 }
 
 int main(int argc, char **argv)
@@ -62,17 +83,56 @@ int main(int argc, char **argv)
             cstrlist_split(parser->excl, argv[n], ",", false, true);
         }
 
+        // file time ----------------------------------------------------------
+
+        else if (strcmp(part, "-at") == 0)
+        {
+            parser_set(parser, DP_ATIME);
+        }
+
+        else if (strcmp(part, "-p") == 0)
+        {
+            if (++n >= argc)
+                return EXIT_FAILURE;
+
+            parser_set_timenow(parser, argv[n]);
+        }
+
+        else if (strcmp(part, "-sgt") == 0)
+        {
+            if (++n >= argc)
+                return EXIT_FAILURE;
+
+            if (_get_size(&parser->s1, argv[n]))
+            {
+                if (!parser->info)
+                    parser->info = cfileinfo_new();
+            }
+        }
+
+        else if (strcmp(part, "-slt") == 0)
+        {
+            if (++n >= argc)
+                return EXIT_FAILURE;
+
+            if (_get_size(&parser->s1, argv[n]))
+            {
+                if (!parser->info)
+                    parser->info = cfileinfo_new();
+            }
+        }
+
         else if (strcmp(part, "-eq") == 0)
         {
             if (++n >= argc)
                 return EXIT_FAILURE;
 
-            if (parser_get_date(argv[n], &parser->t1))
+            if (_get_date(&parser->t1, argv[n]))
             {
                 if (!parser->info)
                     parser->info = cfileinfo_new();
 
-                parser->t2 = parser->t1 + 86399;
+                parser->t2 = parser->t1 + 86399; // + 23h 59m 59s
             }
         }
 
@@ -81,7 +141,7 @@ int main(int argc, char **argv)
             if (++n >= argc)
                 return EXIT_FAILURE;
 
-            if (parser_get_date(argv[n], &parser->t1))
+            if (_get_date(&parser->t1, argv[n]))
             {
                 if (!parser->info)
                     parser->info = cfileinfo_new();
@@ -93,7 +153,7 @@ int main(int argc, char **argv)
             if (++n >= argc)
                 return EXIT_FAILURE;
 
-            if (parser_get_date(argv[n], &parser->t2))
+            if (_get_date(&parser->t2, argv[n]))
             {
                 if (!parser->info)
                     parser->info = cfileinfo_new();
@@ -101,6 +161,8 @@ int main(int argc, char **argv)
                 parser->t2 += 86399; // date + 23:59:59
             }
         }
+
+        // execute command ----------------------------------------------------
 
         else if (strcmp(part, "-exec") == 0)
         {
@@ -111,6 +173,8 @@ int main(int argc, char **argv)
         {
             parser_args_append(parser, part);
         }
+
+        // pattern ------------------------------------------------------------
 
         else
         {

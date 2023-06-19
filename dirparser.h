@@ -10,8 +10,7 @@ typedef struct _DirParser DirParser;
 #define DP_NONE      0
 #define DP_ALL      (1 << 0)
 #define DP_SINGLE   (1 << 1)
-
-//#define DP_OTHER  (1 << 2)
+#define DP_ATIME    (1 << 2)
 //#define DP_OTHER  (1 << 3)
 
 struct _DirParser
@@ -25,6 +24,8 @@ struct _DirParser
     CFileInfo *info;
     uint64_t t1;
     uint64_t t2;
+    uint64_t s1;
+    uint64_t s2;
 
     CList *args;
     CList *argsreal;
@@ -42,7 +43,8 @@ GC_UNUSED static inline void _freeDirParser(DirParser **parser)
 
 void parser_set(DirParser *parser, int flag);
 bool parser_is_set(DirParser *parser, int flag);
-bool parser_get_date(const char *datestr, uint64_t *result);
+bool parser_set_timenow(DirParser *parser, const char *timestr);
+
 void parser_args_append(DirParser *parser, const char *arg);
 void parser_args_terminate(DirParser *parser);
 
