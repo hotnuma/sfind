@@ -12,8 +12,6 @@
 #include <errno.h>
 #include <sys/stat.h>
 
-#include <libapp.h>
-
 #include <print.h>
 
 static bool _matchfunc(const char *dir, const char *item,
@@ -35,7 +33,6 @@ DirParser *parser_new()
 
 void parser_free(DirParser *parser)
 {
-    cstr_free(parser->directory);
     cstrlist_free(parser->pathlist);
 
     cstrlist_free(parser->excl);
@@ -71,9 +68,30 @@ void parser_args_terminate(DirParser *parser)
     if (!parser->args)
         return;
 
+    // append a default {} if needed
+
+    bool found = false;
+    int size = clist_size(parser->args);
+
+    for (int i = 0; i < size; ++i)
+    {
+        const char *arg = (const char*) clist_at(parser->args, i);
+
+        if (arg && strcmp(arg, "{}") == 0)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if (!found)
+        clist_append(parser->args, strdup("{}"));
+
+    // null terminate and duplicate the list
+
     clist_append(parser->args, NULL);
 
-    int size = clist_size(parser->args);
+    size = clist_size(parser->args);
 
     if (!parser->argsreal)
         parser->argsreal = clist_new(size, (CDeleteFunc) free);
@@ -90,21 +108,6 @@ void parser_args_terminate(DirParser *parser)
 
 bool parser_run(DirParser *parser, const char *dirpath)
 {
-    if (!parser->directory)
-        parser->directory = cstr_new_size(256);
-
-    if (strcmp(dirpath, ".") == 0)
-    {
-        if (getcwd(cstr_data(parser->directory), 256) == NULL)
-            return false;
-
-        cstr_terminate(parser->directory, -1);
-    }
-    else
-    {
-        cstr_copy(parser->directory, dirpath);
-    }
-
     CDirParserAuto *dir = cdirparser_new();
     cdirparser_setmatch(dir, (CDirParserMatch)_matchfunc, parser);
 
@@ -219,8 +222,6 @@ static bool _parser_exec(DirParser *parser, const char *filepath)
     if (!parser->args)
         return false;
 
-    char *currdir = c_str(parser->directory);
-
     char **argv = (char**) clist_data(parser->argsreal);
 
     int size = clist_size(parser->args);
@@ -240,8 +241,6 @@ static bool _parser_exec(DirParser *parser, const char *filepath)
         }
     }
 
-    //printf("exec :");
-
     size = clist_size(parser->argsreal);
 
     for (int i = 0; i < size; ++i)
@@ -250,11 +249,7 @@ static bool _parser_exec(DirParser *parser, const char *filepath)
 
         if (!arg)
             break;
-
-        //printf(" %s", arg);
     }
-
-    //printf("\n");
 
     // make sure output of command doesn't get mixed with global output.
     fflush(stdout);
@@ -283,14 +278,7 @@ static bool _parser_exec(DirParser *parser, const char *filepath)
             _exit(1);
         }
 
-        if (chdir(currdir) != 0)
-            exit(EXIT_FAILURE);
-
-        //printf("execute : %s\n", argv[0]);
-
         execvp(argv[0], argv);
-
-        printf("failed\n");
 
         _exit(1);
     }

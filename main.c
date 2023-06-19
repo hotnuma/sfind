@@ -8,6 +8,9 @@ static int _app_exit(bool usage, int ret)
     {
         print("*** usage :");
         print("\tsfind dirpath");
+        print("\tsfind . \"*.c\"");
+        print("\tsfind . -x \"exclude,dirs\" \"*.h,*.c\"");
+        print("\tsfind . \"*.h,*.c\" -exec ls -la {}");
     }
 
     return ret;
