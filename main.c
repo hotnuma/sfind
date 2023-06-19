@@ -35,7 +35,12 @@ int main(int argc, char **argv)
     {
         const char *part = argv[n];
 
-        if (strcmp(part, "-x") == 0)
+        if (strcmp(part, "-a") == 0)
+        {
+            parser_set(parser, DP_ALL);
+        }
+
+        else if (strcmp(part, "-x") == 0)
         {
             if (++n >= argc)
                 return EXIT_FAILURE;
@@ -45,27 +50,63 @@ int main(int argc, char **argv)
 
             cstrlist_split(parser->excl, argv[n], ",", false, true);
         }
-        else if (strcmp(part, "-a") == 0)
+
+        else if (strcmp(part, "-eq") == 0)
         {
-            parser_set(parser, DP_ALL);
+            if (++n >= argc)
+                return EXIT_FAILURE;
+
+            if (parser_get_date(argv[n], &parser->t1))
+            {
+                if (!parser->info)
+                    parser->info = cfileinfo_new();
+
+                parser->t2 = parser->t1 + 86399;
+            }
         }
+
+        else if (strcmp(part, "-from") == 0)
+        {
+            if (++n >= argc)
+                return EXIT_FAILURE;
+
+            if (parser_get_date(argv[n], &parser->t1))
+            {
+                if (!parser->info)
+                    parser->info = cfileinfo_new();
+            }
+        }
+
+        else if (strcmp(part, "-to") == 0)
+        {
+            if (++n >= argc)
+                return EXIT_FAILURE;
+
+            if (parser_get_date(argv[n], &parser->t2))
+            {
+                if (!parser->info)
+                    parser->info = cfileinfo_new();
+
+                parser->t2 += 86399; // date + 23:59:59
+            }
+        }
+
         else if (strcmp(part, "-exec") == 0)
         {
             argmode = true;
         }
+
+        else if (argmode)
+        {
+            parser_args_append(parser, part);
+        }
+
         else
         {
-            if (argmode)
-            {
-                parser_args_append(parser, part);
-            }
-            else
-            {
-                if (!parser->incl)
-                    parser->incl = cstrlist_new_size(12);
+            if (!parser->incl)
+                parser->incl = cstrlist_new_size(12);
 
-                cstrlist_split(parser->incl, part, ",", false, true);
-            }
+            cstrlist_split(parser->incl, part, ",", false, true);
         }
 
         ++n;

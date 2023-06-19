@@ -12,7 +12,16 @@
 #include <errno.h>
 #include <sys/stat.h>
 
+#include <time.h>
+//#include <inttypes.h>
+
 #include <print.h>
+
+#if defined O_LARGEFILE
+#define OPENFLAGS (O_RDONLY | O_LARGEFILE)
+#else
+#define OPENFLAGS (O_RDONLY)
+#endif
 
 static bool _matchfunc(const char *dir, const char *item,
                        int type, DirParser *parser);
@@ -53,6 +62,20 @@ void parser_set(DirParser *parser, int flag)
 bool parser_is_set(DirParser *parser, int flag)
 {
     return ((parser->flags & flag) != 0);
+}
+
+bool parser_get_date(const char *datestr, uint64_t *result)
+{
+    struct tm tm = {0};
+
+    if (strptime(datestr, "%Y/%m/%d", &tm) == NULL)
+        return false;
+
+    tm.tm_isdst = -1;
+
+    *result = mktime(&tm);
+
+    return true;
 }
 
 void parser_args_append(DirParser *parser, const char *arg)
@@ -165,9 +188,24 @@ static bool _matchfunc(const char *dir, const char *item,
 
 static bool _parser_match(DirParser *parser, const char *filepath)
 {
+    if (parser->info && cfileinfo_read(parser->info, filepath))
+    {
+        uint64_t mtime = cfileinfo_mtime(parser->info);
+
+        //print("%u", mtime);
+
+        if (parser->t1 > 0 && mtime < parser->t1)
+            return false;
+
+        if (parser->t2 > 0 && mtime > parser->t2)
+            return false;
+    }
+
+    // all files
     if (parser->incl == NULL)
         return true;
 
+    // patterns
     int size = cstrlist_size(parser->incl);
     for (int i = 0; i < size; ++i)
     {
@@ -192,11 +230,7 @@ static int _compare(void *entry1, void *entry2)
     return path_cmp(c_str(e1), c_str(e2));
 }
 
-#if defined O_LARGEFILE
-#define OPENFLAGS (O_RDONLY | O_LARGEFILE)
-#else
-#define OPENFLAGS (O_RDONLY)
-#endif
+// exec -----------------------------------------------------------------------
 
 static bool prep_child_for_exec(bool close_stdin)
 {
