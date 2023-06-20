@@ -25,6 +25,32 @@ static int _app_exit(bool usage, int ret)
 
 bool _get_size(uint64_t *result, const char *sizestr)
 {
+    char *end;
+    double val = strtod(sizestr, &end);
+
+    if (!end)
+        return false;
+
+    if (strcmp(end, " k") == 0)
+    {
+        val *= 1024;
+
+        //print("k = %u", (uint64_t) val);
+    }
+    else if (strcmp(end, " m") == 0)
+    {
+        val *= 1024 * 1024;
+
+        //print("m = %u", (uint64_t) val);
+    }
+    else if (strcmp(end, " g") == 0)
+    {
+        val *= 1024 * 1024 * 1024;
+
+        //print("g = %u", (uint64_t) val);
+    }
+
+    *result = (uint64_t) val;
 
     return true;
 }
@@ -98,27 +124,33 @@ int main(int argc, char **argv)
             parser_set_timenow(parser, argv[n]);
         }
 
-        else if (strcmp(part, "-sgt") == 0)
+        else if (strcmp(part, "-zgt") == 0)
         {
             if (++n >= argc)
                 return EXIT_FAILURE;
 
-            if (_get_size(&parser->s1, argv[n]))
+            if (_get_size(&parser->size, argv[n]))
             {
                 if (!parser->info)
                     parser->info = cfileinfo_new();
+
+                parser_uset(parser, DP_SIZELT);
+                parser_set(parser, DP_SIZEGT);
             }
         }
 
-        else if (strcmp(part, "-slt") == 0)
+        else if (strcmp(part, "-zlt") == 0)
         {
             if (++n >= argc)
                 return EXIT_FAILURE;
 
-            if (_get_size(&parser->s1, argv[n]))
+            if (_get_size(&parser->size, argv[n]))
             {
                 if (!parser->info)
                     parser->info = cfileinfo_new();
+
+                parser_uset(parser, DP_SIZEGT);
+                parser_set(parser, DP_SIZELT);
             }
         }
 
@@ -127,12 +159,12 @@ int main(int argc, char **argv)
             if (++n >= argc)
                 return EXIT_FAILURE;
 
-            if (_get_date(&parser->t1, argv[n]))
+            if (_get_date(&parser->time1, argv[n]))
             {
                 if (!parser->info)
                     parser->info = cfileinfo_new();
 
-                parser->t2 = parser->t1 + 86399; // + 23h 59m 59s
+                parser->time2 = parser->time1 + 86399; // + 23h 59m 59s
             }
         }
 
@@ -141,7 +173,7 @@ int main(int argc, char **argv)
             if (++n >= argc)
                 return EXIT_FAILURE;
 
-            if (_get_date(&parser->t1, argv[n]))
+            if (_get_date(&parser->time1, argv[n]))
             {
                 if (!parser->info)
                     parser->info = cfileinfo_new();
@@ -153,12 +185,12 @@ int main(int argc, char **argv)
             if (++n >= argc)
                 return EXIT_FAILURE;
 
-            if (_get_date(&parser->t2, argv[n]))
+            if (_get_date(&parser->time2, argv[n]))
             {
                 if (!parser->info)
                     parser->info = cfileinfo_new();
 
-                parser->t2 += 86399; // date + 23:59:59
+                parser->time2 += 86399; // date + 23:59:59
             }
         }
 

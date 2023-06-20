@@ -2,17 +2,18 @@
 
 #include "pathcmp.h"
 #include <cdirparser.h>
-#include <fnmatch.h>
-#include <stdio.h>
 
+#include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <fnmatch.h>
+#include <time.h>
+
 #include <sys/wait.h>
 #include <signal.h>
 #include <errno.h>
-#include <time.h>
 
-//#include <print.h>
+#include <print.h>
 
 #if defined O_LARGEFILE
 #define OPENFLAGS (O_RDONLY | O_LARGEFILE)
@@ -51,14 +52,19 @@ void parser_free(DirParser *parser)
 
 // params ---------------------------------------------------------------------
 
-void parser_set(DirParser *parser, int flag)
+void parser_set(DirParser *parser, int flags)
 {
-    parser->flags |= flag;
+    parser->flags |= flags;
 }
 
-bool parser_is_set(DirParser *parser, int flag)
+void parser_uset(DirParser *parser, int flags)
 {
-    return ((parser->flags & flag) != 0);
+    parser->flags &= ~(flags);
+}
+
+bool parser_is_set(DirParser *parser, int flags)
+{
+    return ((parser->flags & flags) == flags);
 }
 
 bool parser_set_timenow(DirParser *parser, const char *timestr)
@@ -73,22 +79,22 @@ bool parser_set_timenow(DirParser *parser, const char *timestr)
 
     if (strcmp(end, " se") == 0)
     {
-        printf("sec = %lu\n", val);
+        print("sec = %lu", val);
         scale = 1;
     }
     else if (strcmp(end, " mi") == 0)
     {
-        printf("min = %lu\n", val);
+        print("min = %lu", val);
         scale = 60;
     }
     else if (strcmp(end, " ho") == 0)
     {
-        printf("hour = %lu\n", val);
+        print("hour = %lu", val);
         scale = 3600;
     }
     else if (strcmp(end, " da") == 0)
     {
-        printf("day = %lu\n", val);
+        print("day = %lu", val);
         scale = 86400;
     }
     else
@@ -102,9 +108,9 @@ bool parser_set_timenow(DirParser *parser, const char *timestr)
     if (!parser->info)
         parser->info = cfileinfo_new();
 
-    parser->t2 = time(NULL);
-    parser->t1 = parser->t2 - (val * scale) - 1;
-    parser->t2 += 3600;
+    parser->time2 = time(NULL);
+    parser->time1 = parser->time2 - (val * scale) - 1;
+    parser->time2 += 3600;
 
     return true;
 }
@@ -193,7 +199,7 @@ bool parser_run(DirParser *parser, const char *dirpath)
         if (parser->args)
             _parser_exec(parser, c_str(path));
         else
-            printf("%s\n", c_str(path));
+            print("%s", c_str(path));
     }
 
     return true;
@@ -227,17 +233,31 @@ static bool _parser_match(DirParser *parser, const char *filepath)
     if (parser->info && cfileinfo_read(parser->info, filepath))
     {
         uint64_t ftime;
+        uint64_t fsize;
 
         if (parser_is_set(parser, DP_ATIME))
             ftime = cfileinfo_atime(parser->info);
         else
             ftime = cfileinfo_mtime(parser->info);
 
-        if (parser->t1 > 0 && ftime < parser->t1)
+        if (parser->time1 > 0 && ftime < parser->time1)
             return false;
 
-        if (parser->t2 > 0 && ftime > parser->t2)
+        if (parser->time2 > 0 && ftime > parser->time2)
             return false;
+
+        if (parser_is_set(parser, DP_SIZEGT))
+        {
+            fsize = cfileinfo_size(parser->info);
+            if (fsize < parser->size)
+                return false;
+        }
+        else if (parser_is_set(parser, DP_SIZELT))
+        {
+            fsize = cfileinfo_size(parser->info);
+            if (fsize > parser->size)
+                return false;
+        }
     }
 
     // all files
@@ -360,7 +380,7 @@ static bool _parser_exec(DirParser *parser, const char *filepath)
     {
         if (errno != EINTR)
         {
-            printf("interupt\n");
+            print("interupt");
 
             return false; // fail
         }
