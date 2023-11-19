@@ -8,16 +8,16 @@ static int _app_exit(bool usage, int ret)
     if (usage)
     {
         print("*** usage :");
-        print("sfind /home/me/mydir");
-        print("sfind . -a");
-        print("sfind . -s");
+        print("sfind /my/dir \"*.h,*.c\"");
         print("sfind . \"*.c\"");
-        print("sfind . -x \"not_this\" \"*.c\"");
-        print("sfind . -x \"exclude,dirs\" \"*.h,*.c\"");
-        print("sfind . \"*.c\" -exec ls -la {}");
-        print("sfind . \"*.c\" -exec ls -la");
+        print("sfind . -a \"*.c\"");
+        print("sfind . -s \"*.c\"");
+        print("sfind . -x \"onedir\" \"*.c\"");
+        print("sfind . -x \"onedir,twodir\" \"*.c\"");
         print("sfind . -from \"2023/06/11\" -to \"2023/06/13\"");
         print("sfind . -eq \"2023/06/12\"");
+        print("sfind . \"*.c\" -exec ls -la {}");
+        print("sfind . \"*.c\" -exec ls -la");
     }
 
     return ret;
@@ -31,19 +31,19 @@ bool _get_size(uint64_t *result, const char *sizestr)
     if (!end)
         return false;
 
-    if (strcmp(end, " k") == 0)
+    if (strcmp(end, "K") == 0)
     {
         val *= 1024;
 
         //print("k = %u", (uint64_t) val);
     }
-    else if (strcmp(end, " m") == 0)
+    else if (strcmp(end, "M") == 0)
     {
         val *= 1024 * 1024;
 
         //print("m = %u", (uint64_t) val);
     }
-    else if (strcmp(end, " g") == 0)
+    else if (strcmp(end, "G") == 0)
     {
         val *= 1024 * 1024 * 1024;
 

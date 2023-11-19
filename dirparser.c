@@ -77,22 +77,25 @@ bool parser_set_timenow(DirParser *parser, const char *timestr)
     if (!end)
         return false;
 
-    if (strcmp(end, " se") == 0)
+    //if (*end == ' ')
+    //    ++end;
+
+    if (strcmp(end, "s") == 0)
     {
         //print("sec = %lu", val);
         scale = 1;
     }
-    else if (strcmp(end, " mi") == 0)
+    else if (strcmp(end, "min") == 0)
     {
         //print("min = %lu", val);
         scale = 60;
     }
-    else if (strcmp(end, " ho") == 0)
+    else if (strcmp(end, "h") == 0)
     {
         //print("hour = %lu", val);
         scale = 3600;
     }
-    else if (strcmp(end, " da") == 0)
+    else if (strcmp(end, "d") == 0)
     {
         //print("day = %lu", val);
         scale = 86400;
@@ -278,7 +281,7 @@ static bool _parser_match(DirParser *parser, const char *filepath)
 
 void _parser_sort(DirParser *parser)
 {
-    cstrlist_sort_func(parser->pathlist, (CCompareFunc)_compare);
+    cstrlist_sort_func(parser->pathlist, (CCompareFunc) _compare);
 }
 
 static int _compare(void *entry1, void *entry2)

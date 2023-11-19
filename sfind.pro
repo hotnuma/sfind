@@ -18,6 +18,7 @@ SOURCES = \
     pathcmp.c
 
 DISTFILES = \
+    Readme.md \
     install.sh \
     meson.build \
 

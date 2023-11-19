@@ -27,13 +27,15 @@
 
     `sfind . -eq "2023/06/12"`
 
-    `sfind . -p "120 se"`
+    `sfind . -p 60s`
+    
+    `sfind . -p 30min`
 
 * file size
     
-    `sfind . -zlt "10 m" "*.c"`
+    `sfind . -zlt 10M "*.c"`
     
-    `sfind . -zgt "10 k" "*.c"`
+    `sfind . -zgt 10K "*.c"`
 
 * execute command
 
