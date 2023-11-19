@@ -5,11 +5,11 @@
     
     `sfind . "*.c"`
     
-* show hidden files
+* show all
     
     `sfind . -a "*.c"`
 
-* single dir, no subdirs
+* single dir
     
     `sfind . -s "*.c"`
 
@@ -18,12 +18,6 @@
     `sfind . -x "onedir" "*.c"`
     
     `sfind . -x "onedir,twodir" "*.c"`
-
-* execute command
-
-    `sfind . "*.c" -exec ls -la`
-    
-    `sfind . "*.c" -exec ls -la {}`
 
 * file time
     
@@ -40,5 +34,12 @@
     `sfind . -zlt "10 m" "*.c"`
     
     `sfind . -zgt "10 k" "*.c"`
+
+* execute command
+
+    `sfind . "*.c" -exec ls -la`
+    
+    `sfind . "*.c" -exec ls -la {}`
+
 
 

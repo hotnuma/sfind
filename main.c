@@ -111,63 +111,6 @@ int main(int argc, char **argv)
 
         // file time ----------------------------------------------------------
 
-        else if (strcmp(part, "-at") == 0)
-        {
-            parser_set(parser, DP_ATIME);
-        }
-
-        else if (strcmp(part, "-p") == 0)
-        {
-            if (++n >= argc)
-                return EXIT_FAILURE;
-
-            parser_set_timenow(parser, argv[n]);
-        }
-
-        else if (strcmp(part, "-zgt") == 0)
-        {
-            if (++n >= argc)
-                return EXIT_FAILURE;
-
-            if (_get_size(&parser->size, argv[n]))
-            {
-                if (!parser->info)
-                    parser->info = cfileinfo_new();
-
-                parser_uset(parser, DP_SIZELT);
-                parser_set(parser, DP_SIZEGT);
-            }
-        }
-
-        else if (strcmp(part, "-zlt") == 0)
-        {
-            if (++n >= argc)
-                return EXIT_FAILURE;
-
-            if (_get_size(&parser->size, argv[n]))
-            {
-                if (!parser->info)
-                    parser->info = cfileinfo_new();
-
-                parser_uset(parser, DP_SIZEGT);
-                parser_set(parser, DP_SIZELT);
-            }
-        }
-
-        else if (strcmp(part, "-eq") == 0)
-        {
-            if (++n >= argc)
-                return EXIT_FAILURE;
-
-            if (_get_date(&parser->time1, argv[n]))
-            {
-                if (!parser->info)
-                    parser->info = cfileinfo_new();
-
-                parser->time2 = parser->time1 + 86399; // + 23h 59m 59s
-            }
-        }
-
         else if (strcmp(part, "-from") == 0)
         {
             if (++n >= argc)
@@ -194,6 +137,65 @@ int main(int argc, char **argv)
             }
         }
 
+        else if (strcmp(part, "-at") == 0)
+        {
+            parser_set(parser, DP_ATIME);
+        }
+
+        else if (strcmp(part, "-eq") == 0)
+        {
+            if (++n >= argc)
+                return EXIT_FAILURE;
+
+            if (_get_date(&parser->time1, argv[n]))
+            {
+                if (!parser->info)
+                    parser->info = cfileinfo_new();
+
+                parser->time2 = parser->time1 + 86399; // + 23h 59m 59s
+            }
+        }
+
+        else if (strcmp(part, "-p") == 0)
+        {
+            if (++n >= argc)
+                return EXIT_FAILURE;
+
+            parser_set_timenow(parser, argv[n]);
+        }
+
+        // file size ----------------------------------------------------------
+
+        else if (strcmp(part, "-zlt") == 0)
+        {
+            if (++n >= argc)
+                return EXIT_FAILURE;
+
+            if (_get_size(&parser->size, argv[n]))
+            {
+                if (!parser->info)
+                    parser->info = cfileinfo_new();
+
+                parser_uset(parser, DP_SIZEGT);
+                parser_set(parser, DP_SIZELT);
+            }
+        }
+
+        else if (strcmp(part, "-zgt") == 0)
+        {
+            if (++n >= argc)
+                return EXIT_FAILURE;
+
+            if (_get_size(&parser->size, argv[n]))
+            {
+                if (!parser->info)
+                    parser->info = cfileinfo_new();
+
+                parser_uset(parser, DP_SIZELT);
+                parser_set(parser, DP_SIZEGT);
+            }
+        }
+
         // execute command ----------------------------------------------------
 
         else if (strcmp(part, "-exec") == 0)
@@ -206,7 +208,7 @@ int main(int argc, char **argv)
             parser_args_append(parser, part);
         }
 
-        // pattern ------------------------------------------------------------
+        // search pattern -----------------------------------------------------
 
         else
         {
