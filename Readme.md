@@ -1,21 +1,17 @@
 
 * basic search
     
-    `sfind /home/me/mydir`
-    
-    `sfind /home/me/mydir` \"*.c\"`
-    
     `sfind /home/me/mydir` \"*.h,*.c\"`
     
     `sfind . \"*.c\"`
     
 * show hidden files
     
-    `sfind . -a`
+    `sfind . -a \"*.c\"`
 
 * single dir, no subdirs
     
-    `sfind . -s`
+    `sfind . -s \"*.c\"`
 
 * exclude directory list
 
@@ -37,18 +33,12 @@
 
     `sfind . -eq \"2023/06/12\"`
 
+    `sfind . -p \"120 se\"`
+
 * file size
     
     `sfind . -zlt \"10 m\" \"*.c\"`
     
     `sfind . -zgt \"10 k\" \"*.c\"`
 
-<!--
-else if (strcmp(part, "-p") == 0)
-{
-    if (++n >= argc)
-        return EXIT_FAILURE;
 
-    parser_set_timenow(parser, argv[n]);
-}
--->
