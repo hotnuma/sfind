@@ -1,7 +1,7 @@
 
 * basic search
     
-    `sfind /home/me/mydir` \"*.h,*.c\"`
+    `sfind /home/me/mydir \"*.h,*.c\"`
     
     `sfind . \"*.c\"`
     
