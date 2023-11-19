@@ -79,22 +79,22 @@ bool parser_set_timenow(DirParser *parser, const char *timestr)
 
     if (strcmp(end, " se") == 0)
     {
-        print("sec = %lu", val);
+        //print("sec = %lu", val);
         scale = 1;
     }
     else if (strcmp(end, " mi") == 0)
     {
-        print("min = %lu", val);
+        //print("min = %lu", val);
         scale = 60;
     }
     else if (strcmp(end, " ho") == 0)
     {
-        print("hour = %lu", val);
+        //print("hour = %lu", val);
         scale = 3600;
     }
     else if (strcmp(end, " da") == 0)
     {
-        print("day = %lu", val);
+        //print("day = %lu", val);
         scale = 86400;
     }
     else
