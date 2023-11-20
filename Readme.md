@@ -1,4 +1,6 @@
 
+#### Examples
+
 * basic search
     
     `sfind /my/dir "*.h,*.c"`
@@ -43,5 +45,16 @@
     
     `sfind . "*.c" -exec ls -la {}`
 
+
+#### Bugs
+    
+The sorting function is currently buggy :
+
+sfind .
+./b/a/a.txt
+./a/a.txt
+./b/a.txt
+./c/a.txt
+./a.txt
 
 
