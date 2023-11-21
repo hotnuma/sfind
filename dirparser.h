@@ -16,7 +16,7 @@ typedef struct _DirParser DirParser;
 
 struct _DirParser
 {
-    CStringList *pathlist;
+    CList *pathlist;
 
     int flags;
     CStringList *excl;

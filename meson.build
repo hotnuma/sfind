@@ -19,6 +19,7 @@ app_deps = [
 
 app_sources = [
     'dirparser.c',
+    'entry.c',
     'main.c',
     'pathcmp.c',
 ]

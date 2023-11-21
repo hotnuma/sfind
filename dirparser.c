@@ -1,14 +1,14 @@
 #include "dirparser.h"
 
+#include "entry.h"
 #include "pathcmp.h"
-#include <cdirparser.h>
 
+#include <cdirparser.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <fnmatch.h>
 #include <time.h>
-
 #include <sys/wait.h>
 #include <signal.h>
 #include <errno.h>
@@ -33,14 +33,14 @@ static bool _parser_exec(DirParser *parser, const char *filepath);
 DirParser *parser_new()
 {
     DirParser *parser = (DirParser *)calloc(1, sizeof(DirParser));
-    parser->pathlist = cstrlist_new_size(128);
+    parser->pathlist = clist_new(128, (CDeleteFunc) entry_free);
 
     return parser;
 }
 
 void parser_free(DirParser *parser)
 {
-    cstrlist_free(parser->pathlist);
+    clist_free(parser->pathlist);
 
     cstrlist_free(parser->excl);
     cstrlist_free(parser->incl);
@@ -189,20 +189,24 @@ bool parser_run(DirParser *parser, const char *dirpath)
         if (!_parser_match(parser, c_str(filepath)))
             continue;
 
-        cstrlist_append_len(parser->pathlist, c_str(filepath), cstr_size(filepath));
+        Entry *entry = entry_new();
+        cstr_copy(entry->path, c_str(filepath));
+
+        clist_append(parser->pathlist, entry);
     }
 
     _parser_sort(parser);
 
-    int size = cstrlist_size(parser->pathlist);
+    int size = clist_size(parser->pathlist);
+
     for (int i = 0; i < size; ++i)
     {
-        CString *path = cstrlist_at(parser->pathlist, i);
+        Entry *entry = (Entry*) clist_at(parser->pathlist, i);
 
         if (parser->args)
-            _parser_exec(parser, c_str(path));
+            _parser_exec(parser, c_str(entry->path));
         else
-            print("%s", c_str(path));
+            print("%s", c_str(entry->path));
     }
 
     return true;
@@ -281,15 +285,18 @@ static bool _parser_match(DirParser *parser, const char *filepath)
 
 void _parser_sort(DirParser *parser)
 {
-    cstrlist_sort_func(parser->pathlist, (CCompareFunc) _compare);
+    clist_sort(parser->pathlist, (CCompareFunc) _compare);
 }
 
 static int _compare(void *entry1, void *entry2)
 {
-    CString *e1 = *((CString **)entry1);
-    CString *e2 = *((CString **)entry2);
+    Entry *e1 = *((Entry **) entry1);
+    Entry *e2 = *((Entry **) entry2);
 
-    return path_cmp(c_str(e1), c_str(e2));
+    const char *s1 = c_str(e1->path);
+    const char *s2 = c_str(e2->path);
+
+    return path_cmp(s1, s2);
 }
 
 // exec -----------------------------------------------------------------------

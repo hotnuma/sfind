@@ -9,11 +9,13 @@ PKGCONFIG += tinyc
 
 HEADERS = \
     dirparser.h \
+    entry.h \
     pathcmp.h
 
 SOURCES = \
     0Temp.c \
     dirparser.c \
+    entry.c \
     main.c \
     pathcmp.c
 
