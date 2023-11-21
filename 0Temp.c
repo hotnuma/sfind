@@ -1,83 +1,40 @@
 
 #if 0
-        else if (strcmp(part, "-ps") == 0)
-        {
-            if (++n >= argc)
-                return EXIT_FAILURE;
 
-            parser_set_timenow(parser, argv[n], 1);
-        }
+#include <libmacros.h>
 
-        else if (strcmp(part, "-pm") == 0)
-        {
-            if (++n >= argc)
-                return EXIT_FAILURE;
-
-            parser_set_timenow(parser, argv[n], 60);
-        }
-
-        else if (strcmp(part, "-ph") == 0)
-        {
-            if (++n >= argc)
-                return EXIT_FAILURE;
-
-            parser_set_timenow(parser, argv[n], 3600);
-        }
-
-        else if (strcmp(part, "-pd") == 0)
-        {
-            if (++n >= argc)
-                return EXIT_FAILURE;
-
-            parser_set_timenow(parser, argv[n], 86400);
-        }
-#endif
-
-#if 0
-bool parser_set_timenow_old(DirParser *parser, const char *timestr, int scale);
-
-bool parser_set_timenow_old(DirParser *parser, const char *timestr, int scale)
+static int _pathparse(const char *str)
 {
-    unsigned long val = strtoul(timestr, NULL, 10);
+    const char *last = NULL;
+    const char *p = str;
 
-    if (val < 1)
-        return false;
+    while (*p)
+    {
+        if (*p == '/')
+            last = p;
 
-    if (!parser->info)
-        parser->info = cfileinfo_new();
+        ++p;
+    }
 
-    parser->t2 = time(NULL);
-    parser->t1 = parser->t2 - (val * scale) - 1;
-    parser->t2 += 3600;
+    if (last)
+        return (last - str);
 
-    return true;
-}
-#endif
-
-#if 0
-CString *directory;
-
-cstr_free(parser->directory);
-
-if (!parser->directory)
-    parser->directory = cstr_new_size(256);
-
-if (strcmp(dirpath, ".") == 0)
-{
-    if (getcwd(cstr_data(parser->directory), 256) == NULL)
-        return false;
-
-    cstr_terminate(parser->directory, -1);
-}
-else
-{
-    cstr_copy(parser->directory, dirpath);
+    return 0;
 }
 
-char *currdir = c_str(parser->directory);
+int path_cmp_2(const char *s1, const char *s2)
+{
+    int n1 = _pathparse(s1);
+    int n2 = _pathparse(s2);
 
-if (chdir(currdir) != 0)
-    exit(EXIT_FAILURE);
+    int result = strncmp(s1, s2, MIN(n1, n2));
+
+    if (result != 0)
+        return result;
+
+    return strcasecmp(s1+n1, s2+n2);
+}
+
 #endif
 
 
