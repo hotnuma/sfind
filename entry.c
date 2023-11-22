@@ -64,13 +64,8 @@ void _entry_setkey(Entry *entry)
         ++p;
     }
 
-    p = c_str(entry->sortkey);
-    int len = strxfrm(NULL, p, 0);
-
-    CStringAuto *temp = cstr_new_size(len + 1);
-    strxfrm(cstr_data(temp), p, len);
-    cstr_terminate(temp, len);
-
+    CStringAuto *temp = cstr_new_size(256);
+    cstr_xfrm(temp, c_str(entry->sortkey));
     cstr_swap(entry->sortkey, temp);
 }
 
