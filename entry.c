@@ -4,7 +4,6 @@
 #include <print.h>
 
 static void _entry_setkey(Entry *entry);
-static bool _is_dir(const char *path);
 
 Entry* entry_new()
 {
@@ -51,7 +50,7 @@ void _entry_setkey(Entry *entry)
         }
         else if (start == true)
         {
-            if (_is_dir(p))
+            if (strchr(p, '/') != NULL)
                 cstr_append_c(result, '0');
             else
                 cstr_append_c(result, '1');
@@ -67,19 +66,6 @@ void _entry_setkey(Entry *entry)
     CStringAuto *temp = cstr_new_size(256);
     cstr_xfrm(temp, c_str(entry->sortkey));
     cstr_swap(entry->sortkey, temp);
-}
-
-bool _is_dir(const char *path)
-{
-    while (*path)
-    {
-        if (*path == '/')
-            return true;
-
-        ++path;
-    }
-
-    return false;
 }
 
 
