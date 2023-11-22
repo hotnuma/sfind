@@ -1,7 +1,6 @@
 #include "dirparser.h"
 
 #include "entry.h"
-#include "pathcmp.h"
 
 #include <cdirparser.h>
 #include <stdio.h>
@@ -10,7 +9,6 @@
 #include <fnmatch.h>
 #include <time.h>
 #include <sys/wait.h>
-#include <signal.h>
 #include <errno.h>
 
 #include <print.h>
@@ -76,9 +74,6 @@ bool parser_set_timenow(DirParser *parser, const char *timestr)
 
     if (!end)
         return false;
-
-    //if (*end == ' ')
-    //    ++end;
 
     if (strcmp(end, "s") == 0)
     {
@@ -190,7 +185,7 @@ bool parser_run(DirParser *parser, const char *dirpath)
             continue;
 
         Entry *entry = entry_new();
-        cstr_copy(entry->path, c_str(filepath));
+        entry_setpath(entry, c_str(filepath));
 
         clist_append(parser->pathlist, entry);
     }
@@ -293,10 +288,10 @@ static int _compare(void *entry1, void *entry2)
     Entry *e1 = *((Entry **) entry1);
     Entry *e2 = *((Entry **) entry2);
 
-    const char *s1 = c_str(e1->path);
-    const char *s2 = c_str(e2->path);
+    const char *s1 = c_str(e1->sortkey);
+    const char *s2 = c_str(e2->sortkey);
 
-    return path_cmp(s1, s2);
+    return strcmp(s1, s2);
 }
 
 // exec -----------------------------------------------------------------------

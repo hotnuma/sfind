@@ -1,5 +1,6 @@
 #include "dirparser.h"
 
+#include <locale.h>
 #include <time.h>
 #include <print.h>
 
@@ -71,6 +72,8 @@ bool _get_date(uint64_t *result, const char *datestr)
 
 int main(int argc, char **argv)
 {
+    setlocale(LC_ALL, "");
+
     DirParserAuto *parser = parser_new();
     CStringAuto *dirpath = cstr_new_size(256);
 

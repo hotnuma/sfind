@@ -14,6 +14,8 @@ struct _Entry
 Entry* entry_new();
 void entry_free();
 
+void entry_setpath(Entry *entry, const char *filepath);
+
 #endif // ENTRY_H
 
 

@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-static int _count(const char *str)
+static int _dircount(const char *str)
 {
     int ret = 0;
 
@@ -19,8 +19,8 @@ static int _count(const char *str)
 
 int path_cmp(const char *s1, const char *s2)
 {
-    int n1 = _count(s1);
-    int n2 = _count(s2);
+    int n1 = _dircount(s1);
+    int n2 = _dircount(s2);
 
     if (n1 != n2)
         return n2 - n1;

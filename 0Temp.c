@@ -1,6 +1,47 @@
 
 #if 0
 
+void _entry_setkey(Entry *entry)
+{
+    CString *result = entry->sortkey;
+    cstr_clear(result);
+
+    const char *p = c_str(entry->path);
+    bool start = false;
+
+    while (*p)
+    {
+        if (*p == '/')
+        {
+            start = true;
+        }
+        else if (start == true)
+        {
+            if (_is_dir(p))
+                cstr_append_c(result, '0');
+            else
+                cstr_append_c(result, '1');
+
+            start = false;
+        }
+
+        cstr_append_c(result, *p);
+
+        ++p;
+    }
+
+    p = c_str(entry->sortkey);
+    int len = strxfrm(NULL, p, 0);
+
+    CStringAuto *temp = cstr_new_size(len + 1);
+    strxfrm(cstr_data(temp), p, len);
+    cstr_terminate(temp, len);
+
+    cstr_swap(entry->sortkey, temp);
+}
+
+// ----------------------------------------------------------------------------
+
 #include <libmacros.h>
 
 static int _pathparse(const char *str)
