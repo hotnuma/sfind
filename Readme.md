@@ -46,15 +46,20 @@
     `sfind . "*.c" -exec ls -la {}`
 
 
-#### Bugs
+#### Sorting
     
-The sorting function is currently buggy :
+The default sorting order is like so :
 
-sfind .
-./b/a/a.txt
 ./a/a.txt
+./b/a/a.txt
 ./b/a.txt
 ./c/a.txt
 ./a.txt
+
+With special chars :
+
+./a.txt
+./à.txt
+./b.txt
 
 
