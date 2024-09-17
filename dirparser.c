@@ -30,7 +30,7 @@ static bool _parser_exec(DirParser *parser, const char *filepath);
 
 DirParser *parser_new()
 {
-    DirParser *parser = (DirParser *)calloc(1, sizeof(DirParser));
+    DirParser *parser = (DirParser *) calloc(1, sizeof(DirParser));
     parser->pathlist = clist_new(128, (CDeleteFunc) entry_free);
 
     return parser;
@@ -194,7 +194,7 @@ bool parser_args_terminate(DirParser *parser)
 bool parser_run(DirParser *parser, const char *dirpath)
 {
     CDirParserAuto *dir = cdirparser_new();
-    cdirparser_setmatch(dir, (CDirParserMatch)_matchfunc, parser);
+    cdirparser_setmatch(dir, (CDirParserMatch) _matchfunc, parser);
 
     int flags = CDP_FILES;
 
