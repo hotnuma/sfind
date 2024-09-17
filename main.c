@@ -224,7 +224,8 @@ int main(int argc, char **argv)
         ++n;
     }
 
-    parser_args_terminate(parser);
+    if (!parser_args_terminate(parser))
+        return EXIT_FAILURE;
 
     parser_run(parser, c_str(dirpath));
 

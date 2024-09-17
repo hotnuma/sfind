@@ -43,7 +43,7 @@ void parser_free(DirParser *parser)
     cstrlist_free(parser->excl);
     cstrlist_free(parser->incl);
     clist_free(parser->args);
-    clist_free(parser->argsreal);
+    clist_free(parser->argscmd);
 
     free(parser);
 }
@@ -121,15 +121,40 @@ void parser_args_append(DirParser *parser, const char *arg)
     clist_append(parser->args, strdup(arg));
 }
 
-void parser_args_terminate(DirParser *parser)
+bool parser_args_terminate(DirParser *parser)
 {
+    CStringAuto *temp = cstr_new_size(64);
+
+    // prepend "*/" if needed
+
+    if (!parser->incl)
+        return false;
+
+    int size = cstrlist_size(parser->incl);
+
+    for (int i = 0; i < size; ++i)
+    {
+        CString *pattern = cstrlist_at(parser->incl, i);
+
+        if (!cstr_contains(pattern, "/", true)
+            && !cstr_contains(pattern, "?", true)
+            && !cstr_contains(pattern, "*", true))
+        {
+            cstr_copy(temp, "*/");
+            cstr_append(temp, c_str(pattern));
+            cstr_swap(pattern, temp);
+        }
+    }
+
+    // format args list
+
     if (!parser->args)
-        return;
+        return true;
 
     // append a default {} if needed
 
     bool found = false;
-    int size = clist_size(parser->args);
+    size = clist_size(parser->args);
 
     for (int i = 0; i < size; ++i)
     {
@@ -151,15 +176,17 @@ void parser_args_terminate(DirParser *parser)
 
     size = clist_size(parser->args);
 
-    if (!parser->argsreal)
-        parser->argsreal = clist_new(size, (CDeleteFunc) free);
+    if (!parser->argscmd)
+        parser->argscmd = clist_new(size, (CDeleteFunc) free);
 
     for (int i = 0; i < size; ++i)
     {
         const char *arg = (const char*) clist_at(parser->args, i);
 
-        clist_append(parser->argsreal, arg ? strdup(arg) : NULL);
+        clist_append(parser->argscmd, arg ? strdup(arg) : NULL);
     }
+
+    return true;
 }
 
 // parse ----------------------------------------------------------------------
@@ -320,7 +347,7 @@ static bool _parser_exec(DirParser *parser, const char *filepath)
     if (!parser->args)
         return false;
 
-    char **argv = (char**) clist_data(parser->argsreal);
+    char **argv = (char**) clist_data(parser->argscmd);
 
     int size = clist_size(parser->args);
 
@@ -339,11 +366,11 @@ static bool _parser_exec(DirParser *parser, const char *filepath)
         }
     }
 
-    size = clist_size(parser->argsreal);
+    size = clist_size(parser->argscmd);
 
     for (int i = 0; i < size; ++i)
     {
-        const char *arg = (const char*) clist_at(parser->argsreal, i);
+        const char *arg = (const char*) clist_at(parser->argscmd, i);
 
         if (!arg)
             break;

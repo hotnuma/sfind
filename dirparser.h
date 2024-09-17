@@ -28,7 +28,7 @@ struct _DirParser
     uint64_t size;
 
     CList *args;
-    CList *argsreal;
+    CList *argscmd;
     int childstatus;
 };
 
@@ -47,7 +47,7 @@ bool parser_is_set(DirParser *parser, int flags);
 bool parser_set_timenow(DirParser *parser, const char *timestr);
 
 void parser_args_append(DirParser *parser, const char *arg);
-void parser_args_terminate(DirParser *parser);
+bool parser_args_terminate(DirParser *parser);
 
 bool parser_run(DirParser *parser, const char *path);
 
