@@ -19,8 +19,8 @@ struct _DirParser
     CList *pathlist;
 
     int flags;
-    CStringList *excl;
-    CStringList *incl;
+    CStringList *exclude;
+    CStringList *include;
 
     CFileInfo *info;
     uint64_t time1;

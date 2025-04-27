@@ -1,7 +1,7 @@
 TEMPLATE = app
 TARGET = sfind
 CONFIG = c99 link_pkgconfig
-DEFINES = _GNU_SOURCE
+DEFINES = _GNU_SOURCE bool=BOOL true=TRUE false=FALSE
 INCLUDEPATH =
 PKGCONFIG =
 

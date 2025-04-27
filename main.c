@@ -106,10 +106,10 @@ int main(int argc, char **argv)
             if (++n >= argc)
                 return EXIT_FAILURE;
 
-            if (!parser->excl)
-                parser->excl = cstrlist_new_size(12);
+            if (!parser->exclude)
+                parser->exclude = cstrlist_new_size(12);
 
-            cstrlist_split(parser->excl, argv[n], ",", false, true);
+            cstrlist_split(parser->exclude, argv[n], ",", false, true);
         }
 
         // file time ----------------------------------------------------------
@@ -215,10 +215,10 @@ int main(int argc, char **argv)
 
         else
         {
-            if (!parser->incl)
-                parser->incl = cstrlist_new_size(12);
+            if (!parser->include)
+                parser->include = cstrlist_new_size(12);
 
-            cstrlist_split(parser->incl, part, ",", false, true);
+            cstrlist_split(parser->include, part, ",", false, true);
         }
 
         ++n;

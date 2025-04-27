@@ -1,8 +1,9 @@
 #include "dirparser.h"
-
 #include "entry.h"
 
 #include <cdirparser.h>
+#include <libpath.h>
+
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -28,7 +29,7 @@ static bool _parser_exec(DirParser *parser, const char *filepath);
 
 // allocate -------------------------------------------------------------------
 
-DirParser *parser_new()
+DirParser* parser_new()
 {
     DirParser *parser = (DirParser *) calloc(1, sizeof(DirParser));
     parser->pathlist = clist_new(128, (CDeleteFunc) entry_free);
@@ -40,8 +41,8 @@ void parser_free(DirParser *parser)
 {
     clist_free(parser->pathlist);
 
-    cstrlist_free(parser->excl);
-    cstrlist_free(parser->incl);
+    cstrlist_free(parser->exclude);
+    cstrlist_free(parser->include);
     clist_free(parser->args);
     clist_free(parser->argscmd);
 
@@ -123,28 +124,8 @@ void parser_args_append(DirParser *parser, const char *arg)
 
 bool parser_args_terminate(DirParser *parser)
 {
-    CStringAuto *temp = cstr_new_size(64);
-
-    // prepend "*/" if needed
-
-    if (!parser->incl)
+    if (!parser->include)
         return false;
-
-    int size = cstrlist_size(parser->incl);
-
-    for (int i = 0; i < size; ++i)
-    {
-        CString *pattern = cstrlist_at(parser->incl, i);
-
-        if (!cstr_contains(pattern, "/", true)
-            && !cstr_contains(pattern, "?", true)
-            && !cstr_contains(pattern, "*", true))
-        {
-            cstr_copy(temp, "*/");
-            cstr_append(temp, c_str(pattern));
-            cstr_swap(pattern, temp);
-        }
-    }
 
     // format args list
 
@@ -154,7 +135,7 @@ bool parser_args_terminate(DirParser *parser)
     // append a default {} if needed
 
     bool found = false;
-    size = clist_size(parser->args);
+    int size = clist_size(parser->args);
 
     for (int i = 0; i < size; ++i)
     {
@@ -243,13 +224,13 @@ static bool _matchfunc(const char *dir, const char *item,
     if (!parser_is_set(parser, DP_ALL) && item[0] == '.')
         return false;
 
-    if (parser->excl == NULL)
+    if (parser->exclude == NULL)
         return true;
 
-    int size = cstrlist_size(parser->excl);
+    int size = cstrlist_size(parser->exclude);
     for (int i = 0; i < size; ++i)
     {
-        CString *pattern = cstrlist_at(parser->excl, i);
+        CString *pattern = cstrlist_at(parser->exclude, i);
         if (fnmatch(c_str(pattern), item, 0) != FNM_NOMATCH)
             return false;
     }
@@ -290,15 +271,22 @@ static bool _parser_match(DirParser *parser, const char *filepath)
     }
 
     // all files
-    if (parser->incl == NULL)
+    if (parser->include == NULL)
         return true;
 
+    // match file names only
+    const char *fname = path_sep(filepath);
+    if (fname)
+        ++fname;
+    else
+        fname = filepath;
+
     // patterns
-    int size = cstrlist_size(parser->incl);
+    int size = cstrlist_size(parser->include);
     for (int i = 0; i < size; ++i)
     {
-        CString *pattern = cstrlist_at(parser->incl, i);
-        if (fnmatch(c_str(pattern), filepath, 0) != FNM_NOMATCH)
+        CString *pattern = cstrlist_at(parser->include, i);
+        if (fnmatch(c_str(pattern), fname, 0) != FNM_NOMATCH)
             return true;
     }
 
