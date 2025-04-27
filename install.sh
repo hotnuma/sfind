@@ -1,34 +1,47 @@
 #!/usr/bin/bash
+# v250329
 
-BASEDIR="$(dirname -- "$(readlink -f -- "$0";)")"
+basedir="$(dirname -- "$(readlink -f -- "$0";)")"
+opt_clean=0
+buildtype="plain"
+appname=${0##*/}
 
-NOCLEAN=0
-BUILDTYPE="plain"
+usage_exit()
+{
+    echo "*** usage :"
+    echo "$appname clean"
+    echo "$appname -type debug"
+    echo "$appname -type plain"
+    echo "$appname -type release"
+    echo "abort..."
+    exit 1
+}
 
-while [[ $# > 0 ]]; do
-    key="$1"
-    case $key in
-        noclean)
-        NOCLEAN=1
-        shift
+while (($#)); do
+    case "$1" in
+        clean)
+        opt_clean=1
         ;;
-        debug)
-        BUILDTYPE="debug"
+        -help)
+        usage_exit
+        ;;
+        -type)
         shift
+        buildtype="$1"
         ;;
         *)
-        shift
         ;;
     esac
+    shift
 done
 
-dest=$BASEDIR/build
-if [[ $NOCLEAN == 0 && -d $dest ]]; then
+dest=$basedir/build
+if [[ $opt_clean == 1 && -d $dest ]]; then
     rm -rf $dest
 fi
 
-meson setup build -Dbuildtype=${BUILDTYPE}
-ninja -C build
-sudo ninja -C build install
+meson setup build -Dbuildtype=${buildtype}
+meson compile -C build
+sudo meson install -C build
 
 

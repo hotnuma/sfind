@@ -12,7 +12,7 @@ HEADERS = \
     entry.h
 
 SOURCES = \
-    0Temp.c \
+    0temp.c \
     dirparser.c \
     entry.c \
     main.c
