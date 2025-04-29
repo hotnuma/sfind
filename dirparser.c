@@ -179,7 +179,7 @@ bool parser_run(DirParser *parser, const char *dirpath)
 
     int flags = CDP_FILES;
 
-    if (!parser_is_set(parser, DP_SINGLE))
+    if (!parser_is_set(parser, DP_NOSUB))
         flags |= CDP_SUBDIRS;
 
     if (!cdirparser_open(dir, dirpath, flags))
@@ -221,7 +221,7 @@ static bool _matchfunc(const char *dir, const char *item,
     (void) dir;
     (void) type;
 
-    if (!parser_is_set(parser, DP_ALL) && item[0] == '.')
+    if (!parser_is_set(parser, DP_HIDDEN) && item[0] == '.')
         return false;
 
     if (parser->exclude == NULL)

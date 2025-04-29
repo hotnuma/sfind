@@ -7,19 +7,19 @@
     
     `sfind . "*.c"`
     
-* show all
+* show hidden files
     
-    `sfind . -a "*.c"`
+    `sfind . -h "*.c"`
 
-* single dir
+* no sub directories
     
-    `sfind . -s "*.c"`
+    `sfind . -n "*.c"`
 
 * exclude directory list
 
-    `sfind . -x "onedir" "*.c"`
+    `sfind . -x "dir1" "*.c"`
     
-    `sfind . -x "onedir,twodir" "*.c"`
+    `sfind . -x "dir1,dir2" "*.c"`
 
 * file time
     
@@ -29,16 +29,18 @@
 
     `sfind . -eq "2023/06/12"`
 
+* past duration
+    
     `sfind . -p 60s`
     
     `sfind . -p 30min`
 
 * file size
     
-    `sfind . -zlt 10M "*.c"`
-    
     `sfind . -zgt 10K "*.c"`
 
+    `sfind . -zlt 10M "*.c"`
+    
 * execute command
 
     `sfind . "*.c" -exec ls -la`

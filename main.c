@@ -2,26 +2,44 @@
 
 #include <locale.h>
 #include <time.h>
+#include <stdio.h>
 #include <print.h>
 
-static int _app_exit(bool usage, int ret)
+static void error_exit(const char *msg)
 {
-    if (usage)
+    if (!msg || *msg == '\0')
     {
-        print("*** usage :");
-        print("sfind /my/dir \"*.h,*.c\"");
-        print("sfind . \"*.c\"");
-        print("sfind . -a \"*.c\"");
-        print("sfind . -s \"*.c\"");
-        print("sfind . -x \"onedir\" \"*.c\"");
-        print("sfind . -x \"onedir,twodir\" \"*.c\"");
-        print("sfind . -from \"2023/06/11\" -to \"2023/06/13\"");
-        print("sfind . -eq \"2023/06/12\"");
-        print("sfind . \"*.c\" -exec ls -la {}");
-        print("sfind . \"*.c\" -exec ls -la");
+        msg = "an error occurred";
     }
 
-    return ret;
+    printf("*** %s\nabort...\n", msg);
+
+    exit(EXIT_FAILURE);
+}
+
+static void usage_exit()
+{
+    print("*** usage :");
+    print("sfind /my/dir \"*.h,*.c\"");
+    print("sfind . \"*.c\"");
+    print("include hidden files :");
+    print("sfind . -h \"*.c\"");
+    print("no sub dirs :");
+    print("sfind . -n \"*.c\"");
+    print("exclude :");
+    print("sfind . -x \"dir1\" \"*.c\"");
+    print("sfind . -x \"dir1,dir2\" \"*.c\"");
+    print("file time :");
+    print("sfind . -from \"2023/06/11\" -to \"2023/06/13\"");
+    print("sfind . -eq \"2023/06/12\"");
+    print("past duration :");
+    print("sfind . -p 60s");
+    print("sfind . -p 60min");
+    print("execute :");
+    print("sfind . \"*.c\" -exec ls -la {}");
+    print("sfind . \"*.c\" -exec ls -la");
+
+    exit(EXIT_FAILURE);
 }
 
 bool _get_size(uint64_t *result, const char *sizestr)
@@ -78,9 +96,7 @@ int main(int argc, char **argv)
     CStringAuto *dirpath = cstr_new_size(256);
 
     if (argc < 2)
-    {
-        return _app_exit(true, EXIT_FAILURE);
-    }
+        usage_exit();
 
     cstr_copy(dirpath, argv[1]);
 
@@ -89,19 +105,20 @@ int main(int argc, char **argv)
 
     while (n < argc)
     {
-        const char *part = argv[n];
-
-        if (strcmp(part, "-a") == 0)
+        // show hidden
+        if (strcmp(argv[n], "-h") == 0)
         {
-            parser_set(parser, DP_ALL);
+            parser_set(parser, DP_HIDDEN);
         }
 
-        else if (strcmp(part, "-s") == 0)
+        // no sub dirs
+        else if (strcmp(argv[n], "-n") == 0)
         {
-            parser_set(parser, DP_SINGLE);
+            parser_set(parser, DP_NOSUB);
         }
 
-        else if (strcmp(part, "-x") == 0)
+        // exclude
+        else if (strcmp(argv[n], "-x") == 0)
         {
             if (++n >= argc)
                 return EXIT_FAILURE;
@@ -114,7 +131,13 @@ int main(int argc, char **argv)
 
         // file time ----------------------------------------------------------
 
-        else if (strcmp(part, "-from") == 0)
+        // access time
+        else if (strcmp(argv[n], "-at") == 0)
+        {
+            parser_set(parser, DP_ATIME);
+        }
+
+        else if (strcmp(argv[n], "-from") == 0)
         {
             if (++n >= argc)
                 return EXIT_FAILURE;
@@ -126,7 +149,7 @@ int main(int argc, char **argv)
             }
         }
 
-        else if (strcmp(part, "-to") == 0)
+        else if (strcmp(argv[n], "-to") == 0)
         {
             if (++n >= argc)
                 return EXIT_FAILURE;
@@ -140,12 +163,7 @@ int main(int argc, char **argv)
             }
         }
 
-        else if (strcmp(part, "-at") == 0)
-        {
-            parser_set(parser, DP_ATIME);
-        }
-
-        else if (strcmp(part, "-eq") == 0)
+        else if (strcmp(argv[n], "-eq") == 0)
         {
             if (++n >= argc)
                 return EXIT_FAILURE;
@@ -159,7 +177,8 @@ int main(int argc, char **argv)
             }
         }
 
-        else if (strcmp(part, "-p") == 0)
+        // past duration
+        else if (strcmp(argv[n], "-p") == 0)
         {
             if (++n >= argc)
                 return EXIT_FAILURE;
@@ -169,22 +188,8 @@ int main(int argc, char **argv)
 
         // file size ----------------------------------------------------------
 
-        else if (strcmp(part, "-zlt") == 0)
-        {
-            if (++n >= argc)
-                return EXIT_FAILURE;
-
-            if (_get_size(&parser->size, argv[n]))
-            {
-                if (!parser->info)
-                    parser->info = cfileinfo_new();
-
-                parser_uset(parser, DP_SIZEGT);
-                parser_set(parser, DP_SIZELT);
-            }
-        }
-
-        else if (strcmp(part, "-zgt") == 0)
+        // greater
+        else if (strcmp(argv[n], "-zgt") == 0)
         {
             if (++n >= argc)
                 return EXIT_FAILURE;
@@ -199,29 +204,56 @@ int main(int argc, char **argv)
             }
         }
 
+        // lesser
+        else if (strcmp(argv[n], "-zlt") == 0)
+        {
+            if (++n >= argc)
+                return EXIT_FAILURE;
+
+            if (_get_size(&parser->size, argv[n]))
+            {
+                if (!parser->info)
+                    parser->info = cfileinfo_new();
+
+                parser_uset(parser, DP_SIZEGT);
+                parser_set(parser, DP_SIZELT);
+            }
+        }
+
         // execute command ----------------------------------------------------
 
-        else if (strcmp(part, "-exec") == 0)
+        else if (strcmp(argv[n], "-exec") == 0)
         {
             argmode = true;
         }
 
         else if (argmode)
         {
-            parser_args_append(parser, part);
+            parser_args_append(parser, argv[n]);
         }
 
         // search pattern -----------------------------------------------------
 
         else
         {
-            if (!parser->include)
-                parser->include = cstrlist_new_size(12);
+            char *opt = argv[n];
 
-            cstrlist_split(parser->include, part, ",", false, true);
+            if (opt[0] == '-')
+                error_exit("invalid option");
+
+            if (parser->include == NULL)
+                parser->include = cstrlist_new_size(16);
+
+            cstrlist_split(parser->include, argv[n], ",", false, true);
         }
 
         ++n;
+    }
+
+    if (argc > 2 && parser->include == NULL)
+    {
+        parser->include = cstrlist_new_size(16);
+        cstrlist_append(parser->include, "*");
     }
 
     if (!parser_args_terminate(parser))
