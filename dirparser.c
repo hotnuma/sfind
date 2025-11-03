@@ -2,6 +2,7 @@
 #include "entry.h"
 
 #include <cdirparser.h>
+#include <dirent.h>
 #include <libpath.h>
 
 #include <stdio.h>
@@ -186,9 +187,13 @@ bool parser_run(DirParser *parser, const char *dirpath)
         return false;
 
     CStringAuto *filepath = cstr_new_size(256);
+    int type;
 
-    while (cdirparser_read(dir, filepath, NULL))
+    while (cdirparser_read(dir, filepath, &type))
     {
+        if (type != DT_REG)
+            continue;
+
         if (!_parser_match(parser, c_str(filepath)))
             continue;
 
