@@ -241,7 +241,7 @@ int main(int argc, char **argv)
             if (opt[0] == '-')
                 error_exit("invalid option");
 
-            if (parser->include == NULL)
+            if (!parser->include)
                 parser->include = cstrlist_new_size(16);
 
             cstrlist_split(parser->include, argv[n], ",", false, true);
@@ -250,7 +250,7 @@ int main(int argc, char **argv)
         ++n;
     }
 
-    if (argc > 2 && parser->include == NULL)
+    if (!parser->include)
     {
         parser->include = cstrlist_new_size(16);
         cstrlist_append(parser->include, "*");

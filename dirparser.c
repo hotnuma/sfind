@@ -276,7 +276,7 @@ static bool _parser_match(DirParser *parser, const char *filepath)
     }
 
     // all files
-    if (parser->include == NULL)
+    if (!parser->include)
         return true;
 
     // match file names only
