@@ -23,6 +23,8 @@ static void usage_exit()
     print("sfind .");
     print("sfind . \"*.c\"");
     print("sfind /my/dir \"*.h,*.c\"");
+    print("change directory :");
+    print("sfind /my/dir -c");
     print("include hidden files :");
     print("sfind . -h \"*.c\"");
     print("no sub dirs :");
@@ -106,8 +108,14 @@ int main(int argc, char **argv)
 
     while (n < argc)
     {
+        // change directory
+        if (strcmp(argv[n], "-c") == 0)
+        {
+            parser_set(parser, DP_CHDIR);
+        }
+
         // show hidden
-        if (strcmp(argv[n], "-h") == 0)
+        else if (strcmp(argv[n], "-h") == 0)
         {
             parser_set(parser, DP_HIDDEN);
         }

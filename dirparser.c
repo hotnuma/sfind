@@ -177,6 +177,14 @@ bool parser_run(DirParser *parser, const char *dirpath)
 
     int flags = CDP_FILES;
 
+    if (parser_is_set(parser, DP_CHDIR))
+    {
+        if (chdir(dirpath) != 0)
+            return false;
+
+        dirpath = ".";
+    }
+
     if (!parser_is_set(parser, DP_NOSUB))
         flags |= CDP_SUBDIRS;
 
