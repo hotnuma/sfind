@@ -20,8 +20,9 @@ static void error_exit(const char *msg)
 static void usage_exit()
 {
     print("*** usage :");
-    print("sfind /my/dir \"*.h,*.c\"");
+    print("sfind .");
     print("sfind . \"*.c\"");
+    print("sfind /my/dir \"*.h,*.c\"");
     print("include hidden files :");
     print("sfind . -h \"*.c\"");
     print("no sub dirs :");
@@ -189,7 +190,7 @@ int main(int argc, char **argv)
         // file size ----------------------------------------------------------
 
         // greater
-        else if (strcmp(argv[n], "-zgt") == 0)
+        else if (strcmp(argv[n], "-sgt") == 0)
         {
             if (++n >= argc)
                 return EXIT_FAILURE;
@@ -205,7 +206,7 @@ int main(int argc, char **argv)
         }
 
         // lesser
-        else if (strcmp(argv[n], "-zlt") == 0)
+        else if (strcmp(argv[n], "-slt") == 0)
         {
             if (++n >= argc)
                 return EXIT_FAILURE;
