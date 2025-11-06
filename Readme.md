@@ -3,9 +3,9 @@
 
 * basic search
     
-    `sfind /my/dir "*.h,*.c"`
-    
     `sfind . "*.c"`
+    
+    `sfind /my/dir "*.h,*.c"`
     
 * show hidden files
     
@@ -37,10 +37,10 @@
 
 * file size
     
-    `sfind . -zgt 10K "*.c"`
-
-    `sfind . -zlt 10M "*.c"`
+    `sfind . -slt 10M "*.c"`
     
+    `sfind . -sgt 10K "*.c"`
+
 * execute command
 
     `sfind . "*.c" -exec ls -la`
