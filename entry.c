@@ -1,7 +1,6 @@
 #include "entry.h"
 
 #include <stdlib.h>
-#include <print.h>
 
 static void _entry_setkey(Entry *entry);
 
@@ -31,7 +30,7 @@ void entry_setpath(Entry *entry, const char *filepath)
     cstr_copy(entry->path, filepath);
     _entry_setkey(entry);
 
-    //print("%s", c_str(entry->sortkey));
+    //fprintf(stderr, "%s\n", c_str(entry->sortkey));
 }
 
 void _entry_setkey(Entry *entry)

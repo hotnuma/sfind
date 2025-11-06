@@ -3,7 +3,6 @@
 #include <locale.h>
 #include <time.h>
 #include <stdio.h>
-#include <print.h>
 
 static void error_exit(const char *msg)
 {
@@ -12,35 +11,35 @@ static void error_exit(const char *msg)
         msg = "an error occurred";
     }
 
-    printf("*** %s\nabort...\n", msg);
+    fprintf(stderr, "*** %s\nabort...\n", msg);
 
     exit(EXIT_FAILURE);
 }
 
 static void usage_exit()
 {
-    print("*** usage :");
-    print("sfind .");
-    print("sfind . \"*.c\"");
-    print("sfind /my/dir \"*.h,*.c\"");
-    print("*** change directory :");
-    print("sfind /my/dir -c");
-    print("*** include hidden files :");
-    print("sfind . -h \"*.c\"");
-    print("*** no sub dirs :");
-    print("sfind . -n \"*.c\"");
-    print("*** exclude :");
-    print("sfind . -x \"dir1\" \"*.c\"");
-    print("sfind . -x \"dir1,dir2\" \"*.c\"");
-    print("*** file time :");
-    print("sfind . -from \"2023/06/11\" -to \"2023/06/13\"");
-    print("sfind . -eq \"2023/06/12\"");
-    print("*** past duration :");
-    print("sfind . -p 60s");
-    print("sfind . -p 60min");
-    print("*** execute :");
-    print("sfind . \"*.c\" -exec ls -la {}");
-    print("sfind . \"*.c\" -exec ls -la");
+    fprintf(stderr, "*** usage :\n");
+    fprintf(stderr, "sfind .\n");
+    fprintf(stderr, "sfind . \"*.c\"\n");
+    fprintf(stderr, "sfind /my/dir \"*.h,*.c\"\n");
+    fprintf(stderr, "*** change directory :\n");
+    fprintf(stderr, "sfind /my/dir -c\n");
+    fprintf(stderr, "*** include hidden files :\n");
+    fprintf(stderr, "sfind . -h \"*.c\"\n");
+    fprintf(stderr, "*** no sub dirs :\n");
+    fprintf(stderr, "sfind . -n \"*.c\"\n");
+    fprintf(stderr, "*** exclude :\n");
+    fprintf(stderr, "sfind . -x \"dir1\" \"*.c\"\n");
+    fprintf(stderr, "sfind . -x \"dir1,dir2\" \"*.c\"\n");
+    fprintf(stderr, "*** file time :\n");
+    fprintf(stderr, "sfind . -from \"2023/06/11\" -to \"2023/06/13\"\n");
+    fprintf(stderr, "sfind . -eq \"2023/06/12\"\n");
+    fprintf(stderr, "*** past duration :\n");
+    fprintf(stderr, "sfind . -p 60s\n");
+    fprintf(stderr, "sfind . -p 60min\n");
+    fprintf(stderr, "*** execute :\n");
+    fprintf(stderr, "sfind . \"*.c\" -exec ls -la {}\n");
+    fprintf(stderr, "sfind . \"*.c\" -exec ls -la\n");
 
     exit(EXIT_FAILURE);
 }
@@ -57,19 +56,19 @@ bool _get_size(uint64_t *result, const char *sizestr)
     {
         val *= 1024;
 
-        //print("k = %u", (uint64_t) val);
+        //fprintf(stderr, "k = %u\n", (uint64_t) val);
     }
     else if (strcmp(end, "M") == 0)
     {
         val *= 1024 * 1024;
 
-        //print("m = %u", (uint64_t) val);
+        //fprintf(stderr, "m = %u\n", (uint64_t) val);
     }
     else if (strcmp(end, "G") == 0)
     {
         val *= 1024 * 1024 * 1024;
 
-        //print("g = %u", (uint64_t) val);
+        //fprintf(stderr, "g = %u\n", (uint64_t) val);
     }
 
     *result = (uint64_t) val;

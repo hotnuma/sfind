@@ -79,22 +79,22 @@ bool parser_set_timenow(DirParser *parser, const char *timestr)
 
     if (strcmp(end, "s") == 0)
     {
-        //print("sec = %lu", val);
+        //fprintf(stderr, "sec = %lu\n", val);
         scale = 1;
     }
     else if (strcmp(end, "min") == 0)
     {
-        //print("min = %lu", val);
+        //fprintf(stderr, "min = %lu\n", val);
         scale = 60;
     }
     else if (strcmp(end, "h") == 0)
     {
-        //print("hour = %lu", val);
+        //fprintf(stderr, "hour = %lu\n", val);
         scale = 3600;
     }
     else if (strcmp(end, "d") == 0)
     {
-        //print("day = %lu", val);
+        //fprintf(stderr, "day = %lu\n", val);
         scale = 86400;
     }
     else
@@ -215,6 +215,8 @@ bool parser_run(DirParser *parser, const char *dirpath)
     for (int i = 0; i < size; ++i)
     {
         Entry *entry = (Entry*) clist_at(parser->pathlist, i);
+
+        // execute or print
 
         if (parser->args)
             _parser_exec(parser, c_str(entry->path));
@@ -410,9 +412,9 @@ static bool _parser_exec(DirParser *parser, const char *filepath)
     {
         if (errno != EINTR)
         {
-            print("interupt");
+            fprintf(stderr, "interupt\n");
 
-            return false; // fail
+            return false; // failed
         }
     }
 
