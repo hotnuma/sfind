@@ -125,9 +125,6 @@ void parser_args_append(DirParser *parser, const char *arg)
 
 bool parser_args_terminate(DirParser *parser)
 {
-    if (!parser->include)
-        return false;
-
     // format args list
 
     if (!parser->args)

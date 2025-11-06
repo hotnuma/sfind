@@ -250,12 +250,6 @@ int main(int argc, char **argv)
         ++n;
     }
 
-    if (!parser->include)
-    {
-        parser->include = cstrlist_new_size(16);
-        cstrlist_append(parser->include, "*");
-    }
-
     if (!parser_args_terminate(parser))
         return EXIT_FAILURE;
 
